@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_phoenix/flutter_phoenix.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(
+  Phoenix(
+    child:MyApp()
+  )
+);
 
 bool _isPlayer1 = true;
 List<List<int>> _board = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
@@ -32,6 +37,12 @@ class Board extends StatefulWidget {
 }
 
 class _BoardState extends State<Board> {
+  void resetBoard() {
+    _isPlayer1 = true;
+    _board = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
+    _playerText.value = 'Player 1 plays now!';
+    Phoenix.rebirth(context);
+  }
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -60,7 +71,7 @@ class _BoardState extends State<Board> {
               primary: Colors.black,
               textStyle: const TextStyle(fontSize: 20),
             ),
-            onPressed: () {},
+            onPressed: resetBoard,
             child: const Text('Reset Board'),
           ),]
     );
@@ -99,9 +110,9 @@ class _WhiteBoxState extends State<WhiteBox> {
   _WhiteBoxState(this.row_id, this.id);
   bool _isNotOccupied = true;
   var _usedIcon = Icon(null);
-  void _toggleIcon() {
+  void _modifyBlock() {
     setState(() {
-      print(_playerText);
+      checkWin();
       if (_isPlayer1 & _isNotOccupied){
         _isPlayer1 = false;
         _usedIcon = Icon(Icons.circle_outlined);
@@ -115,7 +126,7 @@ class _WhiteBoxState extends State<WhiteBox> {
         _isNotOccupied = false;
         _board[row_id][id] = -1;
       }
-      checkWin();
+      modifyTextIfGameStops();
     });
   }
   void checkWin(){
@@ -132,6 +143,19 @@ class _WhiteBoxState extends State<WhiteBox> {
         _playerText.value = 'Player2 won!';
       }
     }}
+  void modifyTextIfGameStops(){
+    for(List<List<int>> _comb in _winning_comb){
+      int sum = 0;
+      for(List<int> _elem in _comb){
+        sum += _board[_elem[0]][_elem[1]];
+      }
+      if(sum == 3){
+        _playerText.value = 'Player1 won!';
+      } else if(sum == -3) {
+        _playerText.value = 'Player2 won!';
+      }
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -145,7 +169,7 @@ class _WhiteBoxState extends State<WhiteBox> {
           padding: EdgeInsets.all(0),
           alignment: Alignment.center,
           icon: _usedIcon,
-          onPressed: _toggleIcon,
+          onPressed: _modifyBlock,
         )
     );
   }

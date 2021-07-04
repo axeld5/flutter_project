@@ -137,23 +137,31 @@ class _WhiteBoxState extends State<WhiteBox> {
       }
       if(sum == 3){
         _isNotOccupied = false;
-        _playerText.value = 'Player1 won!';
       } else if(sum == -3){
         _isNotOccupied = false;
-        _playerText.value = 'Player2 won!';
       }
     }}
   void modifyTextIfGameStops(){
+    bool _isNotWon = true;
+    bool _isFull = true;
     for(List<List<int>> _comb in _winning_comb){
       int sum = 0;
       for(List<int> _elem in _comb){
         sum += _board[_elem[0]][_elem[1]];
+        if (_board[_elem[0]][_elem[1]] == 0){
+          _isFull = false;
+        }
       }
       if(sum == 3){
+        _isNotWon = false;
         _playerText.value = 'Player1 won!';
       } else if(sum == -3) {
+        _isNotWon = false;
         _playerText.value = 'Player2 won!';
       }
+    }
+    if (_isFull & _isNotWon){
+      _playerText.value = "It's a tie!";
     }
   }
   @override
